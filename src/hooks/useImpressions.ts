@@ -11,8 +11,7 @@ export function useImpressions() {
         setLoading(true)
         setError(null)
         try {
-            const data = await impressionService.list()
-            setImpressions(data)
+            setImpressions(await impressionService.list())
         } catch {
             setError('Erro ao carregar impressões')
         } finally {
@@ -31,9 +30,7 @@ export function useImpressions() {
         setImpressions(prev => prev.filter(i => i.id !== id))
     }, [])
 
-    useEffect(() => {
-        fetchImpressions()
-    }, [fetchImpressions])
+    useEffect(() => { fetchImpressions() }, [fetchImpressions])
 
     return { impressions, loading, error, create, remove, refetch: fetchImpressions }
 }

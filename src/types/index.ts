@@ -1,34 +1,26 @@
-export interface Impression {
-    id: string
-    person_name: string
-    turma: string
-    value: number
-    created_at: string
-}
+import { useState, useCallback } from 'react'
+import { impressionService } from '../services/api'
+import type { ReportData } from '../types'
 
-export interface CreateImpressionPayload {
-    person_name: string
-    turma: string
-    value: number
-}
+export function useReport() {
+    const [report, setReport] = useState<ReportData | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const [type, setType] = useState<'weekly' | 'monthly' | null>(null)
 
-export interface DashboardData {
-    total_impressions: number
-    total_value: number
-    average_value: number
-    impressions_by_turma: Record<string, number>
-    value_by_turma: Record<string, number>
-    recent_impressions: Impression[]
-}
+    const fetchWeekly = useCallback(async () => {
+        setLoading(true); setError(null); setType('weekly')
+        try { setReport(await impressionService.getWeeklyReport()) }
+        catch { setError('Erro ao carregar relatório semanal') }
+        finally { setLoading(false) }
+    }, [])
 
-export interface ReportData {
-    period_start: string
-    period_end: string
-    total_impressions: number
-    total_value: number
-    average_value: number
-    impressions_by_turma: Record<string, number>
-    value_by_turma: Record<string, number>
-    impressions_by_day: Record<string, number>
-    impressions: Impression[]
+    const fetchMonthly = useCallback(async () => {
+        setLoading(true); setError(null); setType('monthly')
+        try { setReport(await impressionService.getMonthlyReport()) }
+        catch { setError('Erro ao carregar relatório mensal') }
+        finally { setLoading(false) }
+    }, [])
+
+    return { report, loading, error, type, fetchWeekly, fetchMonthly }
 }

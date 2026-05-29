@@ -16,15 +16,10 @@ export function DashboardPage() {
     if (!dashboard) return null
 
     const turmaBarData = Object.entries(dashboard.impressions_by_turma).map(([turma, count]) => ({
-        turma,
-        quantidade: count,
-        valor: dashboard.value_by_turma[turma] ?? 0,
+        turma, quantidade: count, valor: dashboard.value_by_turma[turma] ?? 0,
     }))
 
-    const turmaPieData = Object.entries(dashboard.value_by_turma).map(([name, value]) => ({
-        name,
-        value,
-    }))
+    const turmaPieData = Object.entries(dashboard.value_by_turma).map(([name, value]) => ({ name, value }))
 
     return (
         <div className="page">
@@ -39,11 +34,11 @@ export function DashboardPage() {
                     <p className="stat-value">{dashboard.total_impressions}</p>
                 </div>
                 <div className="stat-card accent-yellow">
-                    <p className="stat-label">Valor Total (R$)</p>
+                    <p className="stat-label">Valor Total</p>
                     <p className="stat-value">R$ {dashboard.total_value.toFixed(2)}</p>
                 </div>
                 <div className="stat-card accent-red">
-                    <p className="stat-label">Ticket Médio (R$)</p>
+                    <p className="stat-label">Ticket Médio</p>
                     <p className="stat-value">R$ {dashboard.average_value.toFixed(2)}</p>
                 </div>
                 <div className="stat-card accent-blue">
@@ -55,39 +50,25 @@ export function DashboardPage() {
             <div className="charts-grid">
                 <div className="chart-card">
                     <h2 className="chart-title">Impressões por Turma</h2>
-                    <ResponsiveContainer width="100%" height={260}>
-                        <BarChart data={turmaBarData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+                    <ResponsiveContainer width="100%" height={220}>
+                        <BarChart data={turmaBarData} margin={{ top: 8, right: 8, left: -10, bottom: 8 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
-                            <XAxis dataKey="turma" tick={{ fill: '#a1a1aa', fontSize: 12 }} />
-                            <YAxis tick={{ fill: '#a1a1aa', fontSize: 12 }} />
+                            <XAxis dataKey="turma" tick={{ fill: '#a1a1aa', fontSize: 11 }} />
+                            <YAxis tick={{ fill: '#a1a1aa', fontSize: 11 }} />
                             <Tooltip contentStyle={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8 }} />
                             <Bar dataKey="quantidade" fill="#00B37E" radius={[4, 4, 0, 0]} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>
-
                 <div className="chart-card">
                     <h2 className="chart-title">Valor por Turma (R$)</h2>
-                    <ResponsiveContainer width="100%" height={260}>
+                    <ResponsiveContainer width="100%" height={220}>
                         <PieChart>
-                            <Pie
-                                data={turmaPieData}
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={60}
-                                outerRadius={100}
-                                paddingAngle={3}
-                                dataKey="value"
-                            >
-                                {turmaPieData.map((_, index) => (
-                                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                                ))}
+                            <Pie data={turmaPieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
+                                {turmaPieData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                             </Pie>
-                            <Tooltip
-                                formatter={(v) => `R$ ${Number(v).toFixed(2)}`}
-                                contentStyle={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8 }}
-                            />
-                            <Legend wrapperStyle={{ color: '#a1a1aa', fontSize: 12 }} />
+                            <Tooltip formatter={(v) => `R$ ${Number(v).toFixed(2)}`} contentStyle={{ background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 8 }} />
+                            <Legend wrapperStyle={{ color: '#a1a1aa', fontSize: 11 }} />
                         </PieChart>
                     </ResponsiveContainer>
                 </div>
@@ -95,28 +76,24 @@ export function DashboardPage() {
 
             <div className="card">
                 <h2 className="chart-title">Últimas Impressões</h2>
-                <table className="table">
-                    <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Turma</th>
-                        <th>Valor</th>
-                        <th>Data</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {dashboard.recent_impressions.map(imp => (
-                        <tr key={imp.id}>
-                            <td>{imp.person_name}</td>
-                            <td><span className="badge">{imp.turma}</span></td>
-                            <td className="value-cell">R$ {imp.value.toFixed(2)}</td>
-                            <td className="date-cell">
-                                {format(new Date(imp.created_at), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
+                <div className="table-scroll-wrap">
+                    <table className="table">
+                        <thead>
+                        <tr><th>Nome</th><th>Turma</th><th>Valor</th><th>Registrado por</th><th>Data</th></tr>
+                        </thead>
+                        <tbody>
+                        {dashboard.recent_impressions.map(imp => (
+                            <tr key={imp.id}>
+                                <td>{imp.person_name}</td>
+                                <td><span className="badge">{imp.turma}</span></td>
+                                <td className="value-cell">R$ {imp.value.toFixed(2)}</td>
+                                <td className="date-cell">{imp.registered_by_name}</td>
+                                <td className="date-cell">{format(new Date(imp.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     )

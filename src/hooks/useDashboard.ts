@@ -11,8 +11,7 @@ export function useDashboard() {
         setLoading(true)
         setError(null)
         try {
-            const data = await impressionService.getDashboard()
-            setDashboard(data)
+            setDashboard(await impressionService.getDashboard())
         } catch {
             setError('Erro ao carregar dashboard')
         } finally {
@@ -20,9 +19,6 @@ export function useDashboard() {
         }
     }, [])
 
-    useEffect(() => {
-        fetch()
-    }, [fetch])
-
+    useEffect(() => { fetch() }, [fetch])
     return { dashboard, loading, error, refetch: fetch }
 }
